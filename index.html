@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Link Viewer</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 16px;
+    }
+    h1 { margin: 0 0 6px; font-size: 26px; }
+    p.sub { margin: 0 0 24px; color: #6b7280; }
+    .card {
+      background: #fff;
+      width: 100%;
+      max-width: 640px;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    input[type="url"] {
+      flex: 1;
+      min-width: 200px;
+      padding: 12px 14px;
+      font-size: 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+    }
+    input[type="url"]:focus { border-color: #2563eb; }
+    button {
+      padding: 12px 18px;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover { background: #1d4ed8; }
+    button.secondary { background: #6b7280; }
+    button.secondary:hover { background: #4b5563; }
+    .preview {
+      margin-top: 22px;
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f9fafb;
+      border: 2px dashed #d1d5db;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .preview img {
+      max-width: 100%;
+      max-height: 500px;
+      display: block;
+    }
+    .msg { color: #6b7280; text-align: center; padding: 20px; }
+    .error { color: #dc2626; }
+    .loading { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <h1>Photo Link Viewer</h1>
+  <p class="sub">Photo ka link paste karein, photo turant show ho jayegi</p>
+
+  <div class="card">
+    <div class="row">
+      <input type="url" id="imageUrl" placeholder="https://example.com/photo.jpg" />
+      <button id="showBtn">Show</button>
+      <button id="clearBtn" class="secondary">Clear</button>
+    </div>
+
+    <div class="preview" id="preview">
+      <div class="msg">Yahan photo dikhegi</div>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("imageUrl");
+    const showBtn = document.getElementById("showBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const preview = document.getElementById("preview");
+
+    function showImage() {
+      const url = input.value.trim();
+
+      if (!url) {
+        preview.innerHTML = '<div class="msg error">Pehle link paste karein</div>';
+        return;
+      }
+
+      try {
+        new URL(url);
+      } catch {
+        preview.innerHTML = '<div class="msg error">Ye valid link nahi hai</div>';
+        return;
+      }
+
+      preview.innerHTML = '<div class="msg loading">Photo load ho rahi hai...</div>';
+
+      const img = new Image();
+      img.onload = () => {
+        preview.innerHTML = "";
+        preview.appendChild(img);
+      };
+      img.onerror = () => {
+        preview.innerHTML = '<div class="msg error">Photo load nahi hui. Link check karein ya link image ka direct link hona chahiye (.jpg, .png etc.)</div>';
+      };
+      img.alt = "Preview";
+      img.src = url;
+    }
+
+    showBtn.addEventListener("click", showImage);
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") showImage();
+    });
+
+    // Paste karte hi automatically show ho
+    input.addEventListener("paste", () => {
+      setTimeout(showImage, 50);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      input.value = "";
+      preview.innerHTML = '<div class="msg">Yahan photo dikhegi</div>';
+      input.focus();
+    });
+  </script>
+</body>
+</html>
